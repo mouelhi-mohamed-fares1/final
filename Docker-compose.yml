@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+  frontend:
+    container_name: composed-container
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    ports:
+      - '3001:3000'
+    depends_on:
+      - backend
+
+  backend:
+    container_name: back-container
+    build:
+      context: ./back
+      dockerfile: DockerFile
+    ports:
+      - '3000:3000'
+    environment:
+      - MONGO_URI=mongodb+srv://stain:00001234@cluster0.lfwfhbm.mongodb.net/
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:latest
+    volumes:
+      - mongodb_data_container:/data/db
+    ports:
+      - '27017:27017'
+
+volumes:
+  mongodb_data_container:
