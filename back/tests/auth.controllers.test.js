@@ -12,7 +12,7 @@ describe('POST /register', () => {
   it('should create a new user and return 201 status code', async () => {
     const res = await request(app)
       .post('/api/auth/register')
-      .send({ username: 'fathi', password: 'fathi', role: 'user'});
+      .send({ username: 'sara', password: 'sara', role: 'user'});
 
       // If the status code is not 200, log the response body
   if (res.statusCode !== 201) {
@@ -22,7 +22,7 @@ describe('POST /register', () => {
     expect(res.statusCode).toEqual(201);
 
     // Check the newly created user in the database
-    const user = await User.findOne({ username: 'fathi' });
+    const user = await User.findOne({ username: 'sara' });
     expect(user).not.toBeNull();
   });
 });
