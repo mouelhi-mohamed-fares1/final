@@ -1,3 +1,45 @@
+# MongoDB Deployment and Service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo:latest
+        ports:
+        - containerPort: 27017
+        volumeMounts:
+        - name: mongo-data
+          mountPath: /data/db
+      volumes:
+      - name: mongo-data
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-service
+spec:
+  selector:
+    app: mongodb
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
+  type: ClusterIP
+
+# Backend Deployment and Service
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -14,15 +56,27 @@ spec:
     spec:
       containers:
       - name: backend
-        image: pfe-leave-back
+        image:  my-app:latest
         ports:
         - containerPort: 3000
         env:
-        - name: MONGO_DB_URI
-          value: "mongodb+srv://stain:00001234@cluster0.lfwfhbm.mongodb.net/"
-        - name: SECRET_KEY
-          value: "djnkjfdvvdfvdfdvdv1"
+        - name: MONGO_URL
+          value: "mongodb://mongodb-service:27017/mydatabase"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+spec:
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+  type: ClusterIP
 
+# Frontend Deployment and Service
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -40,28 +94,20 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: pfe-leave-front
+        image:  my-app2:latest
         ports:
-        - containerPort: 3000
-
+        - containerPort: 3001
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Service
 metadata:
-  name: mongodb
+  name: frontend-service
 spec:
-  replicas: 2
   selector:
-    matchLabels:
-      app: mongodb
-  template:
-    metadata:
-      labels:
-        app: mongodb
-    spec:
-      containers:
-      - name: mongodb
-        image: mongo:latest
-        ports:
-        - containerPort: 27017
-         
+    app: frontend
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3001
+  type: LoadBalancer
+
