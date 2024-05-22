@@ -56,12 +56,12 @@ spec:
     spec:
       containers:
       - name: backend
-        image:  anas999/my-app:latest
+        image: anas999/my-app:latest
         ports:
         - containerPort: 3000
         env:
         - name: MONGO_URL
-          value: "mongodb://mongodb-service:27017/mydatabase"
+          value: "mongodb+srv://stain:00001234@cluster0.lfwfhbm.mongodb.net/"
 ---
 apiVersion: v1
 kind: Service
